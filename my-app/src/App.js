@@ -1,4 +1,6 @@
 import React from 'react';
+import Button from './Button'
+import Table from "./Table";
 
 export default class App extends React.Component {
     alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -6,13 +8,14 @@ export default class App extends React.Component {
 
     state = {
         size: 3,
-        board: [],
+        board: this.generateMatrix(),
         count : 0
     };
 
     getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
+
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
@@ -20,11 +23,21 @@ export default class App extends React.Component {
         return (Math.random() * (max - min) + min).toFixed(3);
     }
 
-    generateMatrix() {
+    generateMatrix(newSize = 3) {
+
+      /*  let size = 3;
+        if (typeof newSize !== 'undefined') {
+            size = newSize;
+        } else {
+            if (typeof this.state !== 'undefined' && typeof this.state.size !== 'undefined') {
+                size = this.state.size;
+            }
+        }*/
+
         let generatedBoard = [];
-        for (let i = 0; i < this.state.size; i++) {
+        for (let i = 0; i < newSize; i++) {
             generatedBoard[i] = [];
-            for (let j = 0; j < this.state.size; j++) {
+            for (let j = 0; j < newSize; j++) {
                 let type = this.getRandomInt(1, 4);
                 let result;
                 switch (type) {
@@ -43,21 +56,8 @@ export default class App extends React.Component {
                 generatedBoard[i][j] = result;
             }
         }
-        this.state.board = generatedBoard;
-    }
 
-    showMatrix() {
-        return   <table style={{textAlign: "center"}}>
-            <tbody>
-            {this.state.board.map((row, i) => (
-                <tr id={i}>
-                    {row.map((col, j) => (
-                        <td id={i + j}>{col}</td>
-                    ))}
-                </tr>
-            ))}
-            </tbody>
-        </table>;
+        return generatedBoard;
     }
 
     count = () => {
@@ -70,29 +70,21 @@ export default class App extends React.Component {
     }
 
     increase = () => {
-        this.state.size++;
-        this.setState({size: this.state.size  })
-        this.generateMatrix()
+        this.setState({size: this.state.size + 1, board: this.generateMatrix(this.state.size + 1) })
     }
 
     decrease = () => {
-        this.state.size--;
-        this.setState({size: this.state.size })
-        this.generateMatrix()
+        this.setState({size: this.state.size - 1, board: this.generateMatrix(this.state.size - 1) })
     }
 
     render() {
-        if (this.state.board.length == 0) {
-            console.log("111");
-            this.generateMatrix()
-        }
         return (
             <div>
-                <h1>{this.showMatrix()}</h1>
+                <h1><Table data={this.state.board} /></h1>
                 <span>{this.state.count}</span>
-                <p><button onClick={this.count}>Считать суму</button></p>
-                <p><button onClick={this.increase}>Увеличить матрицу</button></p>
-                <p><button onClick={this.decrease}>Уменьшить матрицу</button></p>
+                <p><Button onClick={this.increase} text="Увеличить матрицу"/></p>
+                <p><Button onClick={this.decrease} text="Уменьшить матрицу"/></p>
+                <p><Button onClick={this.count} text="Сума"/></p>
             </div>
         );
     }
